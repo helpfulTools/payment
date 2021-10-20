@@ -10,10 +10,9 @@ function App() {
     { id: 4, order: "Forth", date: "2021 August 12th" },
   ];
   const [amount, setAmount] = useState(0);
-  const [installment, setInstallment] = useState(null);
+  const [installment, setInstallment] = useState([]);
   const CreatePaymentPlan = ({ amount }) => {
     const result = dataObject.map((item, index) => {
-      console.log(index);
       return (
         <li className="item-container" key={index}>
           <div className="item">
@@ -21,23 +20,33 @@ function App() {
               <div>{item.date}</div>
               <div>{item.order} Payment</div>
             </div>
-            <div className="item-right">${amount}</div>
+            <div className="item-right">${amount[index]}</div>
           </div>
         </li>
       );
     });
-    console.log("23", result);
     return <ul>{result}</ul>;
   };
 
   const handleUpdateAmount = (e) => {
-    console.log(e.target.value);
     setAmount(e.target.value);
   };
   const handleSubmit = (e) => {
     e.preventDefault();
-    const installment = amount / 4;
-    setInstallment(installment);
+    const decimal = parseFloat((amount % Math.floor(amount)).toFixed(2));
+
+    const splitAmount = parseFloat((Math.floor(amount) / 4).toFixed(2));
+    console.log(splitAmount, typeof decimal);
+    if (decimal >= 0.01) {
+      setInstallment([
+        splitAmount + decimal,
+        splitAmount,
+        splitAmount,
+        splitAmount,
+      ]);
+    } else {
+      setInstallment([splitAmount, splitAmount, splitAmount, splitAmount]);
+    }
   };
   return (
     <div className="App">
@@ -48,7 +57,7 @@ function App() {
           <input onChange={handleUpdateAmount} type="float" id="amount" />
           <input type="submit" value="submit" />
         </form>
-        <CreatePaymentPlan amount={installment} />
+        {installment.length > 0 && <CreatePaymentPlan amount={installment} />}
       </header>
     </div>
   );
